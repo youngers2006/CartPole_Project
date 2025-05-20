@@ -9,7 +9,7 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 
 # Create environment, Note: Used human render mode but to test probably swap to 'rgb_array'
-env = gym.make('CartPole-v1')
+env = gym.make('CartPole-v1',render_mode = 'human')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Reset before test and return a tuple of the current state and any info which i am ignoring with _
 # Note: states to be observed are cart pos, cart vel, pole angle and pole angular vel
@@ -17,7 +17,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 rewards_per_episode = []
 
 # All hyper parameters
-episodes = 1000000
+episodes = 1000
 batch_size = 64
 LearnRate = 0.001
 memlen = 1000
@@ -98,6 +98,7 @@ def train():
             memory.append((state, action, reward, next_state, done))
             state = next_state
             total_reward += reward
+                
 
             if len(memory) >= batch_size:
                 states,actions,rewards,next_states,dones = memory.sample(batch_size)
@@ -114,7 +115,7 @@ def train():
                 loss.backward()
                 optimiser.step()
 
-        epsilon = max(eps_final, epsilon * 0.9999)
+        epsilon = max(eps_final, epsilon * 0.998)
         rewards_per_episode.append(total_reward)
 
         if episode % update_interval == 0:
@@ -135,12 +136,14 @@ def train():
 
 
 train()
-plt.plot(rewards_per_episode)
-plt.xlabel('Episode')
-plt.ylabel('Total Reward')
-plt.title('DQN on CartPole-v1')
-plt.grid()
-plt.show()
+#plt.plot(rewards_per_episode)
+#plt.xlabel('Episode')
+#plt.ylabel('Total Reward')
+#plt.title('DQN on CartPole-v1')
+#plt.grid()
+#plt.show()
+
+
 
 
 
